@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+	<meta charset="utf-8">
+        <title>King Offa's Tomb</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href= "{{url_for('static', filename='css/bootstrap.min.css')}}" rel="stylesheet">
+	<link rel="shortcut icon" href="{{ url_for('static', filename='favicon2.ico') }}">
+	<link href="https://fonts.googleapis.com/css?family=Uncial+Antiqua" rel="stylesheet">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+ </head>
+ <style>
+	body {
+		background-color: grey;
+	}
+		
+		
+	.title {
+		color: linen;
+	 	text-align: center;
+	 	font-family: 'Uncial Antiqua', cursive;
+		font-variant: small-caps;
+		font-size: 300%;
+	}
+		
+	.subtitle {
+		color: black;
+		text-align: center;
+		font-family: 'Uncial Antiqua', cursive;
+		font-variant: small-caps;
+		 font-size: 200%;
+	}
+	.wrapper {
+		text-align:center;
+	}
+		
+	.button{
+		border-style: outset;
+		font-family: 'Uncial Antiqua', cursive;
+		padding: 1em;
+		background-color: blue;
+		border: black;
+		color: white;
+		padding: 15px 32px;
+		text-align: center;
+		text-decoration: none;
+		display: inline-block;
+		font-size: 16px;
+		margin: 4px 2px;
+		cursor: pointer;
+		width: 10%;
+	}
+		
+	.unselected{
+	    border-style: outset;
+	    padding: 1em;
+	    background-color: blue;
+	    color: white;
+	}
+		
+	.selected{
+	    border-style: inset;
+	    padding: 1em;
+	    background-color: yellow;
+	    color: black;
+	}
+		
+	.startgame{
+	    margin-top: 5%;
+	    padding: 1em;
+	}
+		
+ </style>
+ <body>
+	 <h1 class="title"> Setup </h1>
+	 <h2 class="subtitle"> Choose your difficulty</h2>
+	 <div class="wrapper">
+	            <a id="easy" href="#" class="button unselected" onclick="mark_diff(this)">Easy</a>
+		    <a id="normal" href="#" class="button unselected" onclick="mark_diff(this)">Normal</a>
+		    <a id ="hard" href="#" class="button unselected" onclick="mark_diff(this)">Hard</a>
+		    <input name="difficulty" value="normal unselected" type="hidden">
+		</div>
+	 <h3 class="subtitle">Choose the number of Characters</h3>
+	 <div class="wrapper">
+		    <a id="1" class="button unselected" onclick="mark_num(this)">One</a>
+		    <a id="2"  class="button unselected" onclick="mark_num(this)">Two</a>
+		    <a id="3" class="button unselected" onclick="mark_num(this)">Three</a>
+		    <a id="4" class="button unselected" onclick="mark_num(this)">Four</a>
+		    <input name="numclasses" value="one" type="hidden">
+		</div>
+		<p></p>
+	 <h4 class="subtitle">Choose your Class</h4>
+	 <div class="wrapper" id="parentClass">
+		    <p>
+		    <a id= "THN" value="tank" class="button unselected">&#222egen</a>
+		    <a id= "BER" value="melee" class="button unselected">Berserc</a>
+		    <a id= "UTL" value="rogue" class="button unselected">&#362tl&#257ga</a>
+		    <a id= "MUN" value="healer" class="button unselected">Munuc</a>
+		    <a id= "SPM" value="caster" class="button unselected">Sp&#257man</a>
+		    </p>
+		    </p>
+		    <a id= "HLD" value="tank" class="button unselected">Hl&#230fdige</a>
+		    <a id= "WLC" value="melee" class="button unselected">W&#230lcyrge</a>
+		    <a id= "ULA" value="rogue" class="button unselected">&#362tl&#257ga</a>
+		    <a id= "NUN" value="healer" class="button unselected">Nunne</a>
+		    <a id= "SPW" value="caster" class="button unselected">Sp&#257w&#299f</a>
+		    </p>
+	 </div>
+		<p></p>
+		
+	 <div class ="wrapper startgame">
+	         <a href="/game" id= "startGame" method="POST"><img src="static/startgame.png" width="15%"></a>
+		
+	 </div>
+		
+		
+ </body>
+ <script>
+	$(document).ready(function(){
+		$("#startGame").click(function(){
+			var classObject = getVariables();
+			$.ajax({
+			    type: "POST",
+			    url: '/playerSetup',
+			    data: JSON.stringify(classObject),
+			    contentType: "application/json;charset=UTF-8",
+			    success: function(msg){
+				console.log(msg);
+			    }
+			});
+		 });
+	});
+		
+	var buttondiff = null;
+	var buttonnum = null;
+	var buttonclass = [];
+	var count = 0;
+	var charClasses = [];
+				
+	function mark_diff(element){
+		    var val = document.getElementsByName("difficulty")[0];
+		    if (buttondiff != null){
+			buttondiff.style.background = "blue";
+			buttondiff.style.color = "white";    
+		    }
+		    buttondiff = element;
+		    buttondiff.style.background = "yellow";
+		    buttondiff.style.color = "black";
+		    val.value = element.id;
+		    console.log(val.value);
+	}
+			
+	function mark_num(element){
+		    var val = document.getElementsByName("numclasses")[0];
+		    if (buttonnum != null){
+			buttonnum.style.background = "blue";
+			buttonnum.style.color = "white";    
+		    }
+		    buttonnum = element;
+		    buttonnum.style.background = "yellow";
+		    buttonnum.style.color = "black";
+		    val.value = element.id;
+		    console.log(val.value);
+		}        
+		
+		function getInfo(){
+		    var object = getVariables();
+		    //document.getElementById("test2").innerHTML = "Difficulty: "+object.difficulty+ ", Number of classes: "+object.numClasses+ ", Classes selected: "+object.charClasses;
+		}
+		
+		function getVariables(){
+		    var object = {};
+		    var diff = document.getElementsByName("difficulty")[0].value;
+		    var num = document.getElementsByName("numclasses")[0].value;
+		    return { difficulty: diff, numClasses: num, charClasses: charClasses}
+		}
+		
+		
+		function getCount(){
+		    count = parseInt(document.getElementsByName("numclasses")[0].value, 10);
+		    return count;
+		}
+		
+		
+		function changeBackground(el, size, str){
+		    let name = el.id;
+		    let type = el.getAttribute("value");
+		    let classInfo = {name: name, type: type}
+		    el.classList.toggle("selected");
+		    if (el.classList.contains("selected")){
+			if(charClasses.length <size){
+			    var check = document.getElementById(str);
+			    if(check.classList.contains("selected")){
+				alert("You may only choose between one of these classes! Please unslect one to choose this class.");
+				el.classList.toggle("selected");
+			    }
+			    else{
+				charClasses.push(classInfo);
+				console.log(charClasses);
+			    }
+			}
+			else{
+			    alert("You have selected your classes! Please unselect and choose another class if you wish.");
+			    el.classList.toggle("selected");
+			}
+		
+		    }
+		    else{
+			for (var i = 0; i < size; i++){
+			    if (charClasses[i] === el.id){
+				charClasses.splice(i, 1);
+			    }
+			}
+		    }
+			 
+		}
+		
+		function mark_classes(element){
+		    var count = 0;
+		    var size = getCount();
+		    var x = element.target.id;
+		    var el = element.target;
+		    var clicked = 0;
+		    if (x=== "THN"){
+			changeBackground(el, size, "HLD");
+		     }
+		    if (x=== "BER"){
+			changeBackground(el, size, "WLC");
+		    }
+		    if (x=== "UTL"){
+			changeBackground(el, size, "ULA");
+		    }
+		    if (x=== "MUN"){
+			changeBackground(el, size, "NUN");
+		    }
+		    if (x === "SPM"){
+			changeBackground(el, size, "SPW");
+		    }
+		    if (x === "HLD"){
+			changeBackground(el, size, "THN");
+		    }
+		    if (x === "WLC"){
+			changeBackground(el, size, "BER");
+		    }
+		    if (x === "ULA"){
+			changeBackground(el, size, "UTL");
+		    }
+		    if (x === "NUN"){
+			changeBackground(el, size, "MUN");
+		    }
+		    if (x === "SPW"){
+			changeBackground(el, size, "SPM");
+		    }
+		    
+		}
+		
+		
+		var parent = document.getElementById("parentClass");
+		parent.addEventListener("click", mark_classes);
+		
+		
+ </script>
+</html>
